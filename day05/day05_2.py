@@ -1,10 +1,26 @@
+def diagonal_point_spawner(sx,sy,dx,dy):
+    if sx == dx:
+        if sy == dy:
+            return [(dx,dy)]
+    if sx > dx:
+        if sy > dy:
+            return [(dx,dy)] + diagonal_point_spawner(sx,sy,dx+1,dy+1)
+        elif dy > sy:
+            return [(sx,sy)] + diagonal_point_spawner(sx-1,sy+1,dx,dy)
+    if sx < dx:
+        if sy > dy:
+            return [(sx,sy)] + diagonal_point_spawner(sx+1,sy-1,dx,dy)
+        elif dy > sy:
+            return [(sx,sy)] + diagonal_point_spawner(sx+1,sy+1,dx,dy)        
+    return []
+
 intersections = {}
 intersection_counter = 0
 
 with open('AdventOfCode2021/day05/day05.input', 'r+') as f:
     for line in f.readlines():
         source, destiny = line.split(' -> ')
-        sx, sy = map(int, source.split(',')); dx, dy = map(int, destiny.split(','))
+        sx, sy = map(int, source.split(',')); dx, dy = map(int,  destiny.split(','))
 
         if sx == dx:
             if sy > dy:
@@ -20,7 +36,7 @@ with open('AdventOfCode2021/day05/day05.input', 'r+') as f:
                     else:
                         intersections[(sx, sy+i)] = 1
                 
-        if sy == dy:
+        elif sy == dy:
             if sx > dx:
                 for i in range(0,sx-dx+1):
                     if (dx+i, sy) in intersections:
@@ -33,10 +49,16 @@ with open('AdventOfCode2021/day05/day05.input', 'r+') as f:
                         intersections[(sx+i, sy)] += 1
                     else:
                         intersections[(sx+i, sy)] = 1
+        
+        else:
+            for point in diagonal_point_spawner(sx,sy,dx,dy):
+                if point in intersections:
+                    intersections[point] += 1
+                else:
+                    intersections[point] = 1
 
     for k in intersections:
         if intersections[k] > 1:
             intersection_counter+=1
     
 print(intersection_counter)
-    
